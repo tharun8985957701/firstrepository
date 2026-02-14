@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMHS - Student Mental Health Support</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #083344, #312e81, #111827);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover:not(.non-interactive) {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .custom-input {
+             background: rgba(0, 0, 0, 0.2);
+             border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        input[type="radio"] {
+            accent-color: #2dd4bf; /* teal-400 */
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* --- CHATBOT STYLES --- */
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .bot {
+            align-self: flex-start;
+            background: rgba(30, 41, 59, 0.5); /* slate-800/50 */
+            color: #e2e8f0; /* slate-200 */
+            border-bottom-left-radius: 4px;
+        }
+        .user {
+            align-self: flex-end;
+            background: #be185d; /* rose-700 */
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .quick-buttons button {
+            flex: 1 1 48%;
+            padding: 8px;
+            font-size: 13px;
+            border-radius: 20px;
+            border: 1px solid #2dd4bf; /* teal-400 */
+            color: #ccfbf1; /* teal-100 */
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quick-buttons button:hover {
+            background: #2dd4bf;
+            color: #111827;
+        }
+    </style>
+</head>
+<body class="gradient-bg text-white min-h-screen flex items-center justify-center p-4">
+
+    <div id="appContainer" class="w-full max-w-md mx-auto">
+
+        <div id="setupPage" class="w-full">
+            <div class="glass-card non-interactive rounded-2xl p-6 text-center fade-in">
+                <h1 class="text-2xl font-bold tracking-tight">Welcome to SMHS</h1>
+                <p class="text-teal-200 mt-1 mb-6">Let's get you set up.</p>
+                <div class="space-y-4 text-left">
+                    <select id="stateSelect" class="w-full custom-input rounded-lg py-3 px-4 focus:ring-2 focus:ring-teal-400 focus:outline-none transition"><option>Select State</option></select>
+                    <select id="districtSelect" class="w-full custom-input rounded-lg py-3 px-4 focus:ring-2 focus:ring-teal-400 focus:outline-none transition"><option>Select District</option></select>
+                    <input type="text" placeholder="Institute / College Name" class="w-full custom-input rounded-lg py-3 px-4 placeholder-teal-200/70 focus:ring-2 focus:ring-teal-400 focus:outline-none transition">
+                    <input type="text" placeholder="Pincode" class="w-full custom-input rounded-lg py-3 px-4 placeholder-teal-200/70 focus:ring-2 focus:ring-teal-400 focus:outline-none transition">
+                    <select id="languageSelect" class="w-full custom-input rounded-lg py-3 px-4 focus:ring-2 focus:ring-teal-400 focus:outline-none transition">
+                        <option value="">Choose a Language</option>
+                        <option value="en">English</option>
+                        <option value="as">Assamese</option>
+                        <option value="bn">Bengali</option>
+                        <option value="brx">Bodo</option>
+                        <option value="doi">Dogri</option>
+                        <option value="gu">Gujarati</option>
+                        <option value="hi">Hindi</option>
+                        <option value="kn">Kannada</option>
+                        <option value="ks">Kashmiri</option>
+                        <option value="kok">Konkani</option>
+                        <option value="mai">Maithili</option>
+                        <option value="ml">Malayalam</option>
+                        <option value="mni">Manipuri</option>
+                        <option value="mr">Marathi</option>
+                        <option value="ne">Nepali</option>
+                        <option value="or">Odia</option>
+                        <option value="pa">Punjabi</option>
+                        <option value="sa">Sanskrit</option>
+                        <option value="sat">Santali</option>
+                        <option value="sd">Sindhi</option>
+                        <option value="ta">Tamil</option>
+                        <option value="te">Telugu</option>
+                        <option value="ur">Urdu</option>
+                    </select>
+                    <button id="goToRoleSelectionBtn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg mt-4">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="roleSelectionPage" class="w-full hidden">
+            <div class="glass-card non-interactive rounded-2xl p-8 text-center fade-in">
+                <div class="mb-8">
+                    <h1 class="text-5xl font-bold tracking-tight">SMHS</h1>
+                    <p class="text-teal-200 mt-2">Student Mental Health Support</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="studentLoginBtn" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                        Student Login
+                    </button>
+                    <button id="managementLoginBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                        Management Login
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loginPage" class="w-full hidden">
+            <div class="glass-card non-interactive rounded-2xl p-8 text-center fade-in relative">
+                 <button id="backToRoleSelectionBtn" class="absolute top-4 left-4 text-teal-200 hover:text-white"><i data-feather="arrow-left"></i></button>
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold tracking-tight">Student Login</h1>
+                    <p class="text-teal-200 mt-2">Welcome back!</p>
+                </div>
+                
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <input id="ID" type="ID" placeholder="Student College  ID" class="w-full custom-input rounded-lg py-3 px-4 text-white placeholder-teal-200/70 focus:ring-2 focus:ring-teal-400 focus:outline-none transition" required>
+                    </div>
+                    <div>
+                        <input id="password" type="password" placeholder="Password" class="w-full custom-input rounded-lg py-3 px-4 text-white placeholder-teal-200/70 focus:ring-2 focus:ring-teal-400 focus:outline-none transition" required>
+                    </div>
+                    <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                        Login
+                    </button>
+                    <div class="flex justify-between text-xs text-teal-200">
+                        <a href="#" class="hover:underline">Forgot Password?</a>
+                        <a href="#" class="hover:underline">Sign Up</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="mainMenu" class="hidden w-full">
+            <div class="text-center mb-6 fade-in">
+                <p class="text-lg text-teal-200">"You can achieve anything."</p>
+            </div>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div data-page="chatPage" class="menu-item glass-card rounded-2xl p-4 flex flex-col items-center justify-center aspect-square cursor-pointer fade-in">
+                        <svg class="w-16 h-16 mb-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradAI" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><path d="M50 20 A30 30 0 1 1 50 80 A30 30 0 1 1 50 20" fill="url(#gradAI)" opacity="0.4"/><circle cx="50" cy="50" r="25" fill="none" stroke="white" stroke-width="2.5"/><circle cx="40" cy="45" r="4" fill="white"/><path d="M55 42 A 5 5 0 0 1 65 42" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 60 Q 50 65 60 60" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+                        <span class="font-semibold text-center text-sm">Chat with AI Advisor</span>
+                    </div>
+                    <div data-page="testPage" class="menu-item glass-card rounded-2xl p-4 flex flex-col items-center justify-center aspect-square cursor-pointer fade-in">
+                        <svg class="w-16 h-16 mb-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradCheck" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#60a5fa"/></linearGradient></defs><path d="M25 85 V 15 H 60 L 75 30 V 85 H 25 Z" fill="url(#gradCheck)" opacity="0.4"/><path d="M25 85 V 15 H 60 L 75 30 V 85 H 25 Z" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round"/><path d="M60 15 V 30 H 75" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round"/><path d="M40 50 L 50 60 L 65 45" stroke="white" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="font-semibold text-center text-sm">Self Check-up</span>
+                    </div>
+                </div>
+                <div data-page="mindBodyPage" class="menu-item glass-card rounded-2xl p-4 flex items-center justify-center cursor-pointer fade-in">
+                    <svg class="w-16 h-16 mr-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradMindBody" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient></defs><path d="M50 25 C 65 25 70 40 50 55 C 30 40 35 25 50 25 Z" fill="url(#gradMindBody)" opacity="0.4"/><path d="M25 80 C 40 65 60 65 75 80 L 50 70 Z" fill="url(#gradMindBody)" opacity="0.4"/><path d="M50 25 C 65 25 70 40 50 55 C 30 40 35 25 50 25 Z" stroke="white" stroke-width="2.5" fill="none" /><path d="M25 80 C 40 65 60 65 75 80" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+                    <span class="font-bold text-lg">Mind-Body Enrichment</span>
+                </div>
+                <div data-page="relaxationSpacePage" class="menu-item glass-card rounded-2xl p-4 flex items-center justify-center cursor-pointer fade-in">
+                    <svg class="w-16 h-16 mr-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"> <defs><linearGradient id="gradRelax" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><path d="M50 20 A 30 30 0 1 0 50 80 A 30 30 0 1 0 50 20" fill="url(#gradRelax)" opacity="0.4"/><path d="M60 30 A 25 25 0 1 0 35 60" fill="white" opacity="0.8"/><path d="M25 75 H 75" stroke="url(#gradRelax)" stroke-width="3" stroke-linecap="round"/><path d="M20 70 H 80" stroke="url(#gradRelax)" stroke-width="3" stroke-linecap="round" opacity="0.5"/></svg>
+                    <span class="font-bold text-lg">Relaxation Space</span>
+                </div>
+                <div data-page="helplinePage" class="menu-item glass-card rounded-2xl p-4 flex items-center justify-center cursor-pointer fade-in">
+                    <svg class="w-16 h-16 mr-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"> <defs><linearGradient id="gradHelp" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs> <path d="M30 40 L 70 40 L 70 80 L 30 80 Z" fill="url(#gradHelp)" opacity="0.4" rx="5"/> <path d="M70 40 L 70 20 L 50 20 L 30 40 L 70 40" stroke="white" stroke-width="2.5" fill="none" stroke-linejoin="round"/> <path d="M30 40 L 30 80 L 70 80 L 70 40" stroke="white" stroke-width="2.5" fill="none" stroke-linejoin="round"/> <path d="M40 50 L 60 70" stroke="white" stroke-width="3" stroke-linecap="round"/> <path d="M60 50 L 40 70" stroke="white" stroke-width="3" stroke-linecap="round"/> </svg>
+                    <span class="font-bold text-lg">Helpline</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="contentPages" class="hidden w-full h-[85vh] ">
+            
+            <div id="testPage" class="page-content hidden h-full">
+                <div class="glass-card non-interactive rounded-2xl p-6 h-full flex flex-col">
+                    <div class="flex items-center mb-6 flex-shrink-0">
+                        <button class="back-btn mr-4"><i data-feather="arrow-left"></i></button>
+                        <h3 class="text-2xl font-bold">Self Check-up</h3>
+                    </div>
+                    <div id="testContainer" class="flex-grow overflow-y-auto no-scrollbar"></div>
+                    <div id="testResultContainer" class="hidden text-center">
+                        <h4 class="text-xl font-bold mb-2">Thank You!</h4>
+                        <p class="text-teal-200 mb-4">Your test has been submitted.</p>
+                        <div class="bg-black/20 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Results & Suggestions</h5>
+                            <p id="testResultText" class="text-sm text-left"></p>
+                        </div>
+                        <p class="text-xs text-teal-300 mt-4">A report will be sent to the institute management for support purposes. For a clinical diagnosis, please consult a professional.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="relaxationSpacePage" class="page-content hidden h-full">
+                <div class="glass-card non-interactive rounded-2xl p-6 h-full flex flex-col">
+                    <div class="flex items-center mb-6">
+                        <button class="back-btn mr-4"><i data-feather="arrow-left"></i></button>
+                        <h3 class="text-2xl font-bold">Relaxation Space</h3>
+                    </div>
+                    <div class="flex flex-col gap-4 flex-grow">
+                        <div data-page="videosPage" class="menu-item glass-card rounded-2xl p-4 flex-1 flex flex-col items-center justify-center cursor-pointer">
+                            <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradTVPerfected" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fde047"/><stop offset="100%" stop-color="#f97316"/></linearGradient></defs><path d="M15 65 V 35 C 15 32.2386 17.2386 30 20 30 H 80 C 82.7614 30 85 32.2386 85 35 V 65 C 85 67.7614 82.7614 70 80 70 H 20 C 17.2386 70 15 67.7614 15 65 Z" fill="#e0e7ff" rx="5"/><path d="M25 38 H 75 V 62 H 25 Z" fill="url(#gradTVPerfected)" rx="3"/><path d="M40 70 L 35 80 M 60 70 L 65 80" stroke="#e0e7ff" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="10" fill="white" opacity="0.7"/><path d="M47 45 L 56 50 L 47 55 Z" fill="white"/></svg>
+                            <span class="font-semibold text-center text-lg">Funny & Relaxing Videos</span>
+                            <video controls>
+                            <source src="https://youtu.be/ZToicYcHIOU" type="video/mp4">
+                            </video>
+                            <p class="text-sm text-teal-200">A quick laugh to lift your spirits.</p>
+                        </div>
+                        <div data-page="musicPage" class="menu-item glass-card rounded-2xl p-4 flex-1 flex flex-col items-center justify-center cursor-pointer">
+                             <svg class="w-20 h-20 mb-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradMusicPerfected" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#f472b6"/></linearGradient></defs><path d="M20 50 A 30 30 0 1 1 80 50 A 30 30 0 1 1 20 50" fill="none" stroke="url(#gradMusicPerfected)" stroke-width="5"/><path d="M35 50 V 65 H 25 V 50 Z M 65 50 V 65 H 75 V 50 Z" fill="#e0e7ff"/><path d="M35 50 C 35 36.1929 41.1929 30 50 30 C 58.8071 30 65 36.1929 65 50" stroke="#e0e7ff" stroke-width="5" fill="none"/></svg>
+                            <span class="font-semibold text-center text-lg">Relief Music</span>
+                            <audio controls>
+                            <source src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/music1.mpeg?raw=true" type="audio/mpeg">
+                            </audio>
+                            <audio controls>
+                            <source src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/music2.mp3?raw=true" type="audio/mpeg">
+                            </audio>
+                            <audio controls>
+                            <source src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/music3.mpeg?raw=true" type="audio/mpeg">
+                            </audio>
+                            <p class="text-sm text-teal-200">Calm your mind with soothing sounds.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mindBodyPage" class="page-content hidden h-full">
+                <div class="glass-card non-interactive rounded-2xl p-6 h-full flex flex-col">
+                    <div class="flex items-center mb-6">
+                        <button class="back-btn mr-4"><i data-feather="arrow-left"></i></button>
+                        <h3 class="text-2xl font-bold">Mind-Body Enrichment</h3>
+                    </div>
+                    <div class="flex flex-col gap-4 flex-grow">
+                        <div data-page="meditationPage" class="menu-item glass-card rounded-2xl p-4 flex items-center cursor-pointer"><svg class="w-16 h-16 mr-4 flex-shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradMeditation" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#84cc16"/></linearGradient></defs><path d="M25 80 H 75" stroke="url(#gradMeditation)" stroke-width="3" stroke-linecap="round"/><path d="M50 55 C 40 55 35 65 35 70 S 40 80 50 80 S 65 75 65 70 S 60 55 50 55 Z" stroke="white" stroke-width="2.5" fill="none"/><circle cx="50" cy="45" r="5" stroke="white" stroke-width="2.5"/></svg><div><h4 class="font-semibold text-lg">Meditation</h4><p class="text-sm text-teal-200">Find your calm and focus.</p></div></div>
+                        <div data-page="asanasPage" class="menu-item glass-card rounded-2xl p-4 flex items-center cursor-pointer"><svg class="w-16 h-16 mr-4 flex-shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradAsanas" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs><path d="M20 80 H 80" stroke="url(#gradAsanas)" stroke-width="3" stroke-linecap="round"/><path d="M50 80 V 50 L 75 65 M 50 50 L 25 65 M 35 40 H 65" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="50" cy="30" r="5" stroke="white" stroke-width="2.5"/></svg><div><h4 class="font-semibold text-lg">Asanas</h4><p class="text-sm text-teal-200">Strengthen your body and mind.</p></div></div>
+                        <div data-page="mudrasPage" class="menu-item glass-card rounded-2xl p-4 flex items-center cursor-pointer"><svg class="w-16 h-16 mr-4 flex-shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gradMudras" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs><path d="M30 80 V 40 C 30 30 40 20 50 20 C 60 20 70 30 70 40 V 80" stroke="url(#gradMudras)" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M40 80 V 50 C 40 45 45 40 50 40 C 55 40 60 45 60 50 V 80" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M50 40 A 10 10 0 1 0 50 20" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg><div><h4 class="font-semibold text-lg">Mudras</h4><p class="text-sm text-teal-200">Harness your body's energy.</p></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="meditationPage" class="page-content hidden h-full">
+                <div class="glass-card non-interactive rounded-2xl p-6 h-full overflow-y-auto no-scrollbar">
+                    <div class="flex items-center mb-6"><button class="back-btn-nested mr-4" data-target="mindBodyPage"><i data-feather="arrow-left"></i></button><h3 class="text-2xl font-bold">Meditation Tips</h3></div>
+                    <div class="space-y-4 text-teal-100">
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">1. Find a Quiet Spot</h4><p class="mt-1">Choose a calm and quiet place where you won't be disturbed.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/floor.jpg?raw=true" alt="Quiet Spot for Meditation" class="mt-2 rounded-lg"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">2. Sit Comfortably</h4><p class="mt-1">You can sit on a chair with your feet on the floor, or cross-legged on a cushion. Keep your back straight but not stiff.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/sit.jpg?raw=true" alt="Comfortable Meditation Posture" class="mt-2 rounded-lg"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">3. Focus on Your Breath</h4><p class="mt-1">Notice the sensation of your breath as it enters and leaves your body. Don't try to change it, just observe.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/focus.jpg?raw=true" alt="Focus on Breath" class="mt-2 rounded-lg"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">4. Start with Short Sessions</h4><p class="mt-1">Begin with just 2-5 minutes a day and gradually increase the time as you get more comfortable.</p></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">5. Be Kind to Your Wandering Mind</h4><p class="mt-1">Your mind will wander. That's normal. When you notice it, gently guide your attention back to your breath without judgment.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="asanasPage" class="page-content hidden h-full">
+                <div class="glass-card non-interactive rounded-2xl p-6 h-full overflow-y-auto no-scrollbar">
+                    <div class="flex items-center mb-6"><button class="back-btn-nested mr-4" data-target="mindBodyPage"><i data-feather="arrow-left"></i></button><h3 class="text-2xl font-bold">Yoga Asanas</h3></div>
+                     <div class="space-y-4 text-teal-100">
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">1. Sukhasana (Easy Pose)</h4><p class="mt-1">A simple cross-legged sitting asana that helps in calming the mind and correcting posture.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/sukasana.jpeg?raw=true" alt="Woman in Sukhasana (Easy Pose)" class="mt-2 rounded-lg object-cover h-48 w-full"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">2. Balasana (Child's Pose)</h4><p class="mt-1">A gentle resting pose that calms the brain and helps relieve stress and fatigue.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/balasan1.jpeg?raw=true" alt="Woman in Balasana (Child's Pose)" class="mt-2 rounded-lg object-cover h-48 w-full"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">3. Marjaryasana-Bitilasana (Cat-Cow Pose)</h4><p class="mt-1">A dynamic duo of poses that warms the body and brings flexibility to the spine.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/bitilasan1.jpeg?raw=true" alt="Woman doing Marjaryasana-Bitilasana (Cat-Cow Pose)" class="mt-2 rounded-lg object-cover h-48 w-full"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">4. Vrikshasana (Tree Pose)</h4><p class="mt-1">Improves balance and stability in the legs, and brings a sense of calm and focus.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/vrikshana.jpg?raw=true" alt="Woman in Vrikshasana (Tree Pose)" class="mt-2 rounded-lg object-cover h-48 w-full"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">5. Savasana (Corpse Pose)</h4><p class="mt-1">A pose of total relaxation, allowing the body to absorb the benefits of the practice.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/sevasan1.jpeg?raw=true" alt="People in Savasana (Corpse Pose)" class="mt-2 rounded-lg object-cover h-48 w-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mudrasPage" class="page-content hidden h-full">
+                <div class="glass-card non-interactive rounded-2xl p-6 h-full overflow-y-auto no-scrollbar">
+                    <div class="flex items-center mb-6"><button class="back-btn-nested mr-4" data-target="mindBodyPage"><i data-feather="arrow-left"></i></button><h3 class="text-2xl font-bold">Mudras</h3></div>
+                    <div class="space-y-4 text-teal-100">
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">1. Gyan Mudra (Mudra of Knowledge)</h4><p class="mt-1">Touch the tip of your index finger to the tip of your thumb. It helps improve concentration and memory.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/gyanmudra.jpeg?raw=true" alt="Gyan Mudra hand gesture" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">2. Prana Mudra (Mudra of Life)</h4><p class="mt-1">Touch the tip of your thumb with the tips of your ring and little fingers. It increases vitality and reduces fatigue.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/pranamudra.jpeg?raw=true" alt="Prana Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">3. Vayu Mudra (Mudra of Air)</h4><p class="mt-1">Fold your index finger and press it with the thumb. It helps to balance the air element in the body, relieving anxiety.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/vayumudra.jpeg?raw=true" alt="Vayu Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">4. Shunya Mudra (Mudra of Emptiness)</h4><p class="mt-1">Press the first phalanx of your middle finger with the tip of your thumb. It can reduce dullness in the body.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/shyunmudra.jpeg?raw=true" alt="Shunya Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">5. Surya Mudra (Mudra of the Sun)</h4><p class="mt-1">Bend your ring finger and press it with your thumb. It helps to increase the fire element and boost metabolism.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/suryamudra.jpeg?raw=true" alt="Surya Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">6. Akasha Mudra (Mudra of the Space)</h4><p class="mt-1">Sit comfortably, close your eyes, and then gently touch the tip of your middle finger to the tip of your thumb, forming a circular shape. Keep the other fingers (index, ring, and little fingers) extended and relaxed.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/akasha mudra.jpeg?raw=true" alt="Akasha Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">7. Samana Mudra </h4><p class="mt-1">Touch the tip of your thumb to the tip of your index finger to form a circle, keeping the other fingers straight and relaxed. Close your eyes, focus on your breath.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/gamana mudhra.jpeg?raw=true" alt="Samana Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">8. Buddhi Mudra (Mudra of the Mental clarity)</h4><p class="mt-1">Touch the tip of your thumb to the tip of your little finger with light pressure keeping other fingers straight and extended comfortably.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/buddhi midra.jpeg?raw=true" alt="Buddhi Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">9. Hakini Mudra (Mudra for Mind power)</h4><p class="mt-1">Bring your hands to your chest,and gently touch all your fingertips together so each finger corresponds to it's counterpart.Focus on your third eye center and maintain deep breathings. </p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/hakini mudra.jpeg?raw=true" alt="Hakini Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                        <div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">10.Shankha Mudra (Mudra for Pureness)</h4><p class="mt-1">Place the right hand's fingers around the left thumb,then touching the right thumb's pad to the left middle finger's pad.Hold the mudra near your chest,close your eyes,and focus on deep breathing.</p><img src="https://github.com/Anjani-Akula/images-gitkeep/blob/main/shankha mudra.jpeg?raw=true" alt="Shankha Mudra hand gesture diagram" class="mt-2 rounded-lg object-contain h-48 w-full bg-white/10 p-2"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="musicPage" class="page-content hidden h-full">
+                 <div class="glass-card non-interactive rounded-2xl p-6 h-full overflow-y-auto no-scrollbar">
+                    <div class="flex items-center mb-6"><button class="back-btn-nested mr-4" data-target="relaxationSpacePage"><i data-feather="arrow-left"></i></button><h3 class="text-2xl font-bold">Relief Music</h3></div>
+                    <div class="space-y-4"><p class="text-center text-teal-200">Close your eyes and let the music calm your mind.</p><div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden"><iframe class="w-full h-56" src="https://www.youtube.com/embed/videoseries?si=G02Hj4xY3xL1X0g2&amp;list=PLj_h-2S-6295zrwjKYa-a-Ns39C5a-WJp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div></div>
+                </div>
+            </div>
+
+            <div id="videosPage" class="page-content hidden h-full">
+                <div class="glass-card non-interactive rounded-2xl p-6 h-full overflow-y-auto no-scrollbar">
+                    <div class="flex items-center mb-6"><button class="back-btn-nested mr-4" data-target="relaxationSpacePage"><i data-feather="arrow-left"></i></button><h3 class="text-2xl font-bold">Funny & Relaxing Videos</h3></div>
+                    <div class="space-y-6"><div><h4 class="font-semibold mb-2">Funny Animals to Brighten Your Day</h4><div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden"><iframe class="w-full h-56" src="https://www.youtube.com/embed/jPS2aVq_f_A" title="Funny Animals" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div><div><h4 class="font-semibold mb-2">A Moment of Peace</h4><div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden"><iframe class="w-full h-56" src="https://www.youtube.com/embed/BHACKLaGk6M" title="Relaxing Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div></div>
+                </div>
+            </div>
+
+            <div id="chatPage" class="page-content hidden h-full">
+                 <div class="glass-card non-interactive rounded-2xl h-full flex flex-col">
+                    <div class="flex items-center p-4 border-b border-white/10 flex-shrink-0">
+                        <button class="back-btn mr-4"><i data-feather="arrow-left"></i></button>
+                        <h3 class="text-xl font-bold">AI Advisor Chat</h3>
+                    </div>
+                    <div id="chatBox" class="flex-grow p-4 overflow-y-auto no-scrollbar chat-box">
+                        <div class="message bot"><strong>Bot:</strong> Hello! I'm here to listen. How are you feeling today?</div>
+                    </div>
+                    <div class="p-4 border-t border-white/10 flex-shrink-0">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="userMessage" placeholder="Type a message..." class="w-full custom-input rounded-full py-2 px-4 focus:ring-2 focus:ring-teal-400 focus:outline-none transition" onkeydown="if(event.key==='Enter'){sendMessage()}">
+                            <button onclick="sendMessage()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold p-3 rounded-full transition-transform transform hover:scale-105 shadow-lg">
+                                <i data-feather="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="quick-buttons">
+                            <button onclick="sendQuick('Breathing Exercise')">Breathing Exercise</button>
+                            <button onclick="sendQuick('Meditation Suggestion')">Meditation Suggestion</button>
+                            <button onclick="sendQuick('Talk about Anxiety')">Talk about Anxiety</button>
+                            <button onclick="sendQuick('Motivational Quote')">Motivational Quote</button>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+
+            <div id="helplinePage" class="page-content hidden h-full">
+                 <div class="glass-card non-interactive rounded-2xl p-6 h-full overflow-y-auto no-scrollbar">
+                    <div class="flex items-center mb-6"><button class="back-btn mr-4"><i data-feather="arrow-left"></i></button><h3 class="text-2xl font-bold">Professional Helplines</h3></div>
+                    <div class="space-y-6 text-teal-100"><p class="text-center text-teal-200">If you are in crisis or need immediate support, please reach out to one of these 24/7 helplines.</p><div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">National Suicide Prevention Lifeline</h4><p class="text-cyan-300 font-bold text-xl mt-1">988</p></div><div class="bg-black/20 p-4 rounded-lg"><h4 class="font-semibold text-lg">Crisis Text Line</h4><p class="text-cyan-300 font-bold text-xl mt-1">Text HOME to 741741</p></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+
+            // --- Page Elements ---
+            const setupPage = document.getElementById('setupPage');
+            const roleSelectionPage = document.getElementById('roleSelectionPage');
+            const loginPage = document.getElementById('loginPage');
+            const mainMenu = document.getElementById('mainMenu');
+            const contentPagesContainer = document.getElementById('contentPages');
+            
+            // --- Buttons & Forms ---
+            const goToRoleSelectionBtn = document.getElementById('goToRoleSelectionBtn');
+            const studentLoginBtn = document.getElementById('studentLoginBtn');
+            const managementLoginBtn = document.getElementById('managementLoginBtn');
+            const backToRoleSelectionBtn = document.getElementById('backToRoleSelectionBtn');
+            const loginForm = document.getElementById('loginForm');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const backButtons = document.querySelectorAll('.back-btn');
+            const nestedBackButtons = document.querySelectorAll('.back-btn-nested');
+
+            // --- State/District Dropdown Logic ---
+            const statesAndDistricts = {
+                "Andaman and Nicobar Islands": ["Nicobar", "North and Middle Andaman", "South Andaman"],
+                "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Ananthapuramu", "Annamayya", "Bapatla", "Chittoor", "East Godavari", "Eluru", "Guntur", "Kakinada", "Konaseema", "Krishna", "Kurnool", "Nandyal", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "Sri Potti Sriramulu Nellore", "Sri Sathya Sai", "Srikakulam", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
+                "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
+                "Assam": ["Bajali", "Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tamulpur", "Tinsukia", "Udalguri", "West Karbi Anglong"],
+                "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
+                "Chandigarh": ["Chandigarh"],
+                "Chhattisgarh": ["Balod", "Baloda Bazar", "Balrampur", "Bastar", "Bemetara", "Bijapur", "Bilaspur", "Dantewada", "Dhamtari", "Durg", "Gariaband", "Gaurela Pendra Marwahi", "Janjgir Champa", "Jashpur", "Kabirdham", "Kanker", "Khairagarh-Chhuikhadan-Gandai", "Kondagaon", "Korba", "Koriya", "Mahasamund", "Manendragarh-Chirmiri-Bharatpur", "Mohla-Manpur-Ambagarh Chowki", "Mungeli", "Narayanpur", "Raigarh", "Raipur", "Rajnandgaon", "Sakti", "Sarangarh-Bilaigarh", "Sukma", "Surajpur", "Surguja"],
+                "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Diu", "Dadra and Nagar Haveli"],
+                "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
+                "Goa": ["North Goa", "South Goa"],
+                "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda", "Kutch", "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", "Tapi", "Vadodara", "Valsad"],
+                "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Yamunanagar"],
+                "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kinnaur", "Kullu", "Lahaul and Spiti", "Mandi", "Shimla", "Sirmaur", "Solan", "Una"],
+                "Jammu and Kashmir": ["Anantnag", "Bandipora", "Baramulla", "Budgam", "Doda", "Ganderbal", "Jammu", "Kathua", "Kishtwar", "Kulgam", "Kupwara", "Poonch", "Pulwama", "Rajouri", "Ramban", "Reasi", "Samba", "Shopian", "Srinagar", "Udhampur"],
+                "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "East Singhbhum", "Garhwa", "Giridih", "Godda", "Gumla", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahebganj", "Seraikela Kharsawan", "Simdega", "West Singhbhum"],
+                "Karnataka": ["Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayanagara", "Vijayapura", "Yadgir"],
+                "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
+                "Ladakh": ["Kargil", "Leh"],
+                "Lakshadweep": ["Lakshadweep"],
+                "Madhya Pradesh": ["Agar Malwa", "Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Harda", "Indore", "Jabalpur", "Jhabua", "Katni", "Khandwa", "Khargone", "Maihar", "Mandla", "Mandsaur", "Mauganj", "Morena", "Narmadapuram", "Narsinghpur", "Neemuch", "Niwari", "Pachmarhi", "Panna", "Pandhurna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Sidhi", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
+                "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
+                "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Pherzawl", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
+                "Meghalaya": ["East Garo Hills", "East Jaintia Hills", "East Khasi Hills", "North Garo Hills", "Ri Bhoi", "South Garo Hills", "South West Garo Hills", "South West Khasi Hills", "West Garo Hills", "West Jaintia Hills", "West Khasi Hills"],
+                "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Khawzawl", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Saitual", "Serchhip"],
+                "Nagaland": ["Chumoukedima", "Dimapur", "Kiphire", "Kohima", "Longleng", "Mokokchung", "Mon", "Niuland", "Noklak", "Peren", "Phek", "Shamator", "Tseminyu", "Tuensang", "Wokha", "Zunheboto"],
+                "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"],
+                "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam"],
+                "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Malerkotla", "Mansa", "Moga", "Pathankot", "Patiala", "Rupnagar", "Sahibzada Ajit Singh Nagar", "Sangrur", "Shaheed Bhagat Singh Nagar", "Sri Muktsar Sahib", "Tarn Taran"],
+                "Rajasthan": ["Ajmer", "Alwar", "Anupgarh", "Balotra", "Banswara", "Baran", "Barmer", "Beawar", "Bharatpur", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Deeg", "Dholpur", "Didwana-Kuchaman", "Dudu", "Dungarpur", "Ganganagar", "Gangapur City", "Hanumangarh", "Jaipur", "Jaipur Rural", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Jodhpur Rural", "Karauli", "Kekri", "Khairthal-Tijara", "Kota", "Kotputli-Behror", "Nagaur", "Neem Ka Thana", "Pali", "Phalodi", "Pratapgarh", "Rajsamand", "Salumbar", "Sanchore", "Sawai Madhopur", "Shahpura", "Sikar", "Sirohi", "Tonk", "Udaipur"],
+                "Sikkim": ["East Sikkim", "North Sikkim", "Pakyong", "Soreng", "South Sikkim", "West Sikkim"],
+                "Tamil Nadu": ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"],
+                "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hanamkonda", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Komaram Bheem", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Ranga Reddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"],
+                "Tripura": ["Dhalai", "Gomati", "Khowai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
+                "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Ayodhya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddh Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kheri", "Kushinagar", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Prayagraj", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
+                "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
+                "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
+            };
+            const stateSelect = document.getElementById('stateSelect');
+            const districtSelect = document.getElementById('districtSelect');
+
+            // Populate states
+            for (const state in statesAndDistricts) {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            }
+
+            // Handle state change
+            stateSelect.addEventListener('change', (e) => {
+                const selectedState = e.target.value;
+                districtSelect.innerHTML = '<option>Select District</option>'; // Reset
+                if (selectedState && statesAndDistricts[selectedState]) {
+                    statesAndDistricts[selectedState].forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
+                    });
+                }
+            });
+
+            // --- Navigation Logic ---
+            goToRoleSelectionBtn.addEventListener('click', () => {
+                setupPage.classList.add('hidden');
+                roleSelectionPage.classList.remove('hidden');
+            });
+            studentLoginBtn.addEventListener('click', () => {
+                roleSelectionPage.classList.add('hidden');
+                loginPage.classList.remove('hidden');
+            });
+            managementLoginBtn.addEventListener('click', () => {
+                alert('Management Login is not implemented in this demo.');
+            });
+            backToRoleSelectionBtn.addEventListener('click', () => {
+                loginPage.classList.add('hidden');
+                roleSelectionPage.classList.remove('hidden');
+            });
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                loginPage.classList.add('hidden');
+                mainMenu.classList.remove('hidden');
+            });
+
+            const showPage = (pageId, isNested = false) => {
+                 if (!isNested) {
+                    mainMenu.classList.add('hidden');
+                    contentPagesContainer.classList.remove('hidden');
+                }
+                document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
+                const activePage = document.getElementById(pageId);
+                if (activePage) {
+                    activePage.classList.remove('hidden');
+                    activePage.classList.add('fade-in');
+                    if (pageId === 'testPage') startTest();
+                    feather.replace(); 
+                }
+            };
+            const showMainMenu = () => {
+                contentPagesContainer.classList.add('hidden');
+                mainMenu.classList.remove('hidden');
+            };
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const pageId = item.dataset.page;
+                    const isNested = item.closest('.page-content') !== null;
+                    showPage(pageId, isNested);
+                });
+            });
+            backButtons.forEach(button => button.addEventListener('click', showMainMenu));
+            nestedBackButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetPageId = button.dataset.target;
+                    showPage(targetPageId, true);
+                });
+            });
+
+            // --- Self Check-up (Test) Logic ---
+            const testContainer = document.getElementById('testContainer');
+            const testResultContainer = document.getElementById('testResultContainer');
+            const testResultText = document.getElementById('testResultText');
+            let currentQuestionIndex = 0;
+            let userAnswers = [];
+            const questions = [{ q: "Over the last 2 weeks, how often have you felt nervous or anxious?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "How often have you felt down, depressed, or hopeless?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "How often have you had trouble with sleep (too much or too little)?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "How often have you been feeling tired or having little energy?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "How often have you had a poor appetite or been overeating?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "How often have you felt bad about yourself, or that you are a failure?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "How often have you had trouble concentrating on things?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "How often have you been bothered by being easily annoyed or irritable?", o: ["Not at all", "Several days", "More than half the days", "Nearly every day"] },{ q: "Have you felt overwhelmed by your academic workload recently?", o: ["Not at all", "Sometimes", "Often", "Almost always"] },{ q: "Have you been withdrawing from friends, family, or social activities?", o: ["Not at all", "A little bit", "A moderate amount", "A lot"] }];
+            function startTest() { currentQuestionIndex = 0; userAnswers = []; testContainer.innerHTML = ''; testContainer.classList.remove('hidden'); testResultContainer.classList.add('hidden'); displayQuestion(); }
+            function displayQuestion() { if (currentQuestionIndex < questions.length) { const qData = questions[currentQuestionIndex]; let optionsHTML = qData.o.map((option, index) => `<label class="flex items-center bg-black/10 p-3 rounded-lg hover:bg-black/20 cursor-pointer"><input type="radio" name="q_option" value="${index}" class="mr-3">${option}</label>`).join(''); testContainer.innerHTML = `<div class="fade-in"><p class="font-semibold mb-4 text-lg">${currentQuestionIndex + 1}. ${qData.q}</p><div class="space-y-3">${optionsHTML}</div><button id="nextBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-4 rounded-lg mt-6" disabled>Next</button></div>`; const nextBtn = document.getElementById('nextBtn'); const radioOptions = testContainer.querySelectorAll('input[type="radio"]'); radioOptions.forEach(radio => { radio.addEventListener('change', () => { nextBtn.disabled = false; }); }); nextBtn.addEventListener('click', handleNextQuestion); } else { submitTest(); } }
+            function handleNextQuestion() { const selectedOption = testContainer.querySelector('input[name="q_option"]:checked'); if (selectedOption) { userAnswers.push(parseInt(selectedOption.value)); currentQuestionIndex++; displayQuestion(); } }
+            function submitTest() { let score = userAnswers.reduce((total, answer) => total + answer, 0); let resultMessage = ""; if (score <= 5) { resultMessage = "Your score indicates a low level of distress. You seem to be managing well. Keep up with healthy habits and stay connected with friends and family."; } else if (score <= 12) { resultMessage = "Your score suggests mild to moderate distress. It might be helpful to use the resources in the 'Relaxation Space' and consider talking to a peer or counselor. Prioritizing self-care is important right now."; } else { resultMessage = "Your score indicates significant distress. We strongly recommend you reach out for support. Please use the 'Helpline' section or 'AI Advisor' immediately. You are not alone, and help is available."; } testResultText.innerText = resultMessage; testContainer.classList.add('hidden'); testResultContainer.classList.remove('hidden'); testResultContainer.classList.add('fade-in'); }
+        });
+
+        // --- CHATBOT SCRIPT ---
+        const API_URL = "http://127.0.0.1:5000/chat"; // Replace with your Flask server URL
+
+        async function sendMessage(messageText = null) {
+            const input = document.getElementById("userMessage");
+            const text = messageText || input.value.trim();
+            if (!text) return;
+            if (!messageText) input.value = "";
+            addChatMessage("You", text, "user");
+            const typingMsg = addChatMessage("Bot", "Bot is typing...", "bot");
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await response.json();
+                typingMsg.remove();
+                await typeMessage("Bot", data.response);
+            } catch (err) {
+                typingMsg.remove();
+                addChatMessage("Bot", "⚠️ Error: Could not connect to the server.", "bot");
+                console.error(err);
+            }
+        }
+
+        function sendQuick(text) { sendMessage(text); }
+
+        function addChatMessage(sender, text, type) {
+            const chatBox = document.getElementById("chatBox");
+            const msg = document.createElement("div");
+            msg.className = `message ${type}`;
+            msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msg;
+        }
+
+        function typeMessage(sender, text, delay = 30) {
+            return new Promise((resolve) => {
+                const chatBox = document.getElementById("chatBox");
+                const msg = document.createElement("div");
+                msg.className = "message bot";
+                chatBox.appendChild(msg);
+                let i = 0;
+                function typeChar() {
+                    msg.innerHTML = `<strong>${sender}:</strong> ${text.slice(0, i + 1)}`;
+                    i++;
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                    if (i < text.length) setTimeout(typeChar, delay);
+                    else resolve();
+                }
+                typeChar();
+            });
+        }
+    </script>
+</body>
+</html>

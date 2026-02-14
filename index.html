@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; display: flex; justify-content: center; padding: 20px; }
+    #chatbox { width: 400px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    #messages { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    .user { text-align: right; color: blue; margin: 5px; }
+    .bot { text-align: left; color: green; margin: 5px; }
+    #inputArea { display: flex; }
+    #input { flex: 1; padding: 8px; }
+    #send { padding: 8px; background: #007BFF; color: white; border: none; cursor: pointer; }
+    #send:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <div id="chatbox">
+    <h2>Chatbot</h2>
+    <div id="messages"></div>
+    <div id="inputArea">
+      <input type="text" id="input" placeholder="Type a message...">
+      <button id="send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
+    const messages = document.getElementById("messages");
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.className = sender;
+      msg.innerText = text;
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      addMessage("You: " + userText, "user");
+      input.value = "";
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userText })
+        });
+
+        const data = await res.json();
+        addMessage("Bot: " + data.response, "bot");
+      } catch (err) {
+        addMessage("⚠️ Error: Could not reach server", "bot");
+      }
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
